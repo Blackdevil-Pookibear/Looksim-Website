@@ -1,0 +1,3485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lookism RPG Bot - Discord Gacha & RPG Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ===== CSS RESET & VARIABLES ===== */
+        :root {
+            /* Color Palette */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #11111f;
+            --bg-card: #161625;
+            --bg-card-light: #1e1e30;
+            --bg-modal: rgba(10, 10, 15, 0.95);
+            
+            --accent-primary: #8a2be2;
+            --accent-secondary: #00d4ff;
+            --accent-success: #00ff9d;
+            --accent-warning: #ffd700;
+            --accent-danger: #ff3860;
+            
+            --text-primary: #f0f0ff;
+            --text-secondary: #b0b0d0;
+            --text-muted: #8888aa;
+            
+            --border-color: #2a2a3f;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --glow-primary: rgba(138, 43, 226, 0.3);
+            --glow-secondary: rgba(0, 212, 255, 0.3);
+            
+            /* Rarity Colors */
+            --ur-color: #ffd700;
+            --ssr-color: #ff6b6b;
+            --sss-color: #9c27b0;
+            --ss-color: #2196f3;
+            --s-color: #4caf50;
+            --a-color: #ff9800;
+            --b-color: #607d8b;
+            --c-color: #795548;
+            
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-xxl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-xxl: 24px;
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-base: 250ms ease;
+            --transition-slow: 350ms ease;
+            --transition-very-slow: 800ms ease;
+            
+            /* Z-index layers */
+            --z-dropdown: 100;
+            --z-sticky: 200;
+            --z-modal: 1000;
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ===== BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: var(--space-md);
+        }
+
+        h2 {
+            font-size: clamp(1.75rem, 4vw, 3rem);
+            margin-bottom: var(--space-xl);
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), transparent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-md);
+        }
+
+        p {
+            margin-bottom: var(--space-md);
+            color: var(--text-secondary);
+        }
+
+        a {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        a:hover {
+            color: var(--accent-primary);
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .section {
+            padding: var(--space-xxl) 0;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-center h2::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left var(--transition-slow);
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), #6a11cb);
+            color: white;
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px var(--glow-primary);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+            box-shadow: 0 4px 20px var(--glow-secondary);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes imageScroll {
+            0% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-100%);
+            }
+            40% {
+                transform: translateX(-200%);
+            }
+            60% {
+                transform: translateX(-300%);
+            }
+            80% {
+                transform: translateX(-300%);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes imageScrollHover {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-75%);
+            }
+        }
+
+            25% {
+                transform: translateX(-100%);
+            }
+            50% {
+                transform: translateX(-200%);
+            }
+            75% {
+                transform: translateX(-300%);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--transition-slow), transform var(--transition-slow);
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== 1. NAVIGATION ===== */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: var(--z-sticky);
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-md) 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .logo-img {
+            height: 84px;
+            width: auto;
+            border-radius: var(--radius-sm);
+        }
+
+        .logo-accent {
+            color: var(--accent-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-xl);
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            font-weight: 500;
+            position: relative;
+            padding: var(--space-sm) 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-primary);
+            transition: width var(--transition-base);
+        }
+
+        .nav-links a:hover,
+        .nav-links a:focus {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a:focus::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: var(--space-sm);
+        }
+
+        /* ===== 2. HERO SECTION ===== */
+        .hero {
+            padding: var(--space-xxl) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, var(--glow-primary) 0%, transparent 70%);
+            opacity: 0.15;
+            z-index: -1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-xxl);
+            align-items: center;
+        }
+
+        .hero-content {
+            animation: fadeInUp 1s ease;
+            text-align: center;
+        }
+
+        .hero-tagline {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xl);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* ===== BOT CARD SECTION ===== */
+        .bot-card-section {
+            background: var(--bg-secondary);
+        }
+
+        .bot-card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .bot-mockup {
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-color);
+            padding: var(--space-lg);
+            box-shadow: 0 20px 60px var(--shadow-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mockup-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .mockup-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .mockup-content {
+            background: rgba(30, 30, 48, 0.7);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        /* ===== GAMEPLAY SECTION ===== */
+        .gameplay-section {
+            background: var(--bg-primary);
+        }
+
+        .gameplay-content {
+            max-width: 800px;
+            margin: 0 auto var(--space-xxl);
+        }
+
+        .gameplay-content h2 {
+            margin-bottom: var(--space-lg);
+        }
+
+        .gameplay-content h3 {
+            color: var(--accent-secondary);
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-md);
+        }
+
+        .gameplay-content ul {
+            margin-left: var(--space-lg);
+            margin-bottom: var(--space-md);
+            color: var(--text-secondary);
+        }
+
+        .gameplay-content li {
+            margin-bottom: var(--space-sm);
+        }
+
+        .gameplay-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-xl);
+            margin-top: var(--space-xxl);
+        }
+
+        .gameplay-image-container {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-base);
+        }
+
+        .gameplay-image-container:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-secondary);
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+
+        .gameplay-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            background: #000;
+        }
+
+        /* ===== 3. SOCIAL ICONS ===== */
+        .social-icons {
+            display: flex;
+            gap: var(--space-lg);
+            margin-top: var(--space-xl);
+            justify-content: center;
+        }
+
+        .social-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            transition: all var(--transition-base);
+            border: 3px solid transparent;
+            position: relative;
+            background: var(--bg-card);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-6px) scale(1.1);
+            border-color: var(--accent-primary);
+            box-shadow: 0 12px 32px var(--glow-primary);
+            background: var(--bg-card-light);
+        }
+
+        .social-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .social-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 30%, rgba(138, 43, 226, 0.2) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+            border-radius: 50%;
+        }
+
+        .social-icon:hover::after {
+            opacity: 1;
+        }
+
+        /* ===== 4. GLOBAL SEARCH ===== */
+        .global-search {
+            background: var(--bg-secondary);
+            padding: var(--space-lg) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-md) var(--space-lg) var(--space-md) 3rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all var(--transition-base);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--glow-primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--space-lg);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-results {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-top: var(--space-sm);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: var(--z-dropdown);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-category {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-category h4 {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-item {
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            transition: background-color var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .search-item:hover {
+            background: var(--bg-card-light);
+        }
+
+        /* ===== 5. CHARACTERS SECTION ===== */
+        .characters-section {
+            background: var(--bg-secondary);
+        }
+
+        .generation-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-xl);
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .character-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-base);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .character-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 20px 40px var(--shadow-color);
+        }
+
+        .character-image-container {
+            position: relative;
+            height: 250px;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .character-image-wrapper {
+            width: 400%;
+            height: 100%;
+            display: flex;
+            
+        }
+
+        .character-card:hover .character-image-wrapper {
+            animation: imageScrollHover 7s linear infinite;
+        }
+
+        .character-image {
+            width: 25%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            flex-shrink: 0;
+        }
+
+        .character-rarity {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            z-index: 2;
+        }
+
+        .character-info {
+            padding: var(--space-lg);
+        }
+
+        .character-name {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-xs);
+            color: var(--text-primary);
+        }
+
+        .character-generation {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* ===== 6. COMMANDS SECTION ===== */
+        .commands-section {
+            background: var(--bg-primary);
+        }
+
+        .commands-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-xl);
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-weight: 500;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .commands-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .command-category {
+            margin-bottom: var(--space-xl);
+        }
+
+        .command-category h3 {
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-sm);
+            border-bottom: 2px solid var(--border-color);
+            color: var(--accent-secondary);
+        }
+
+        .command-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .command-item {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-base);
+        }
+
+        .command-item:hover {
+            border-color: var(--accent-secondary);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+
+        .command-name {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: var(--accent-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .command-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ===== 7. PULL RATES SECTION ===== */
+        .pull-rates-section {
+            background: var(--bg-secondary);
+        }
+
+        .rates-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .rates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .rate-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rate-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .rate-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+
+        .rate-rarity {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-sm);
+        }
+
+        .rate-percentage {
+            font-size: 2rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* ===== 8. PATREON SECTION ===== */
+        .patreon-section {
+            background: linear-gradient(145deg, var(--bg-primary), #0f0f1a);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .patreon-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .patreon-header {
+            max-width: 800px;
+            margin: 0 auto var(--space-xxl);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .patreon-tagline {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: var(--space-md);
+        }
+
+        .patreon-intro {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .patreon-plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-xl);
+            position: relative;
+            z-index: 1;
+        }
+
+        .plan-card {
+            background: linear-gradient(145deg, var(--bg-card), #1a1a2e);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 20px 40px var(--shadow-color);
+        }
+
+        .plan-card.popular {
+            border: 2px solid var(--accent-primary);
+            transform: scale(1.05);
+        }
+
+        .plan-card.popular:hover {
+            transform: scale(1.05) translateY(-8px);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, var(--accent-primary), #6a11cb);
+            color: white;
+            padding: var(--space-sm) var(--space-xl);
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+
+        .plan-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .plan-name {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: var(--space-sm);
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .plan-price {
+            font-size: 3rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+        }
+
+        .plan-period {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: var(--space-xl);
+        }
+
+        .plan-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+            color: var(--text-secondary);
+        }
+
+        .plan-feature::before {
+            content: '✓';
+            color: var(--accent-success);
+            font-weight: bold;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .plan-cta {
+            text-align: center;
+        }
+
+        /* ===== 9. MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-modal);
+            z-index: var(--z-modal);
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid var(--border-color);
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            z-index: 1;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-card-light);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            padding: var(--space-xxl);
+        }
+
+        .modal-images {
+            position: relative;
+        }
+
+        .modal-main-image {
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: var(--space-md);
+        }
+
+        .modal-main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .modal-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .modal-thumbnail {
+            height: 80px;
+            background: #000;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all var(--transition-fast);
+        }
+
+        .modal-thumbnail.active {
+            border-color: var(--accent-primary);
+        }
+
+        .modal-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-info h2 {
+            font-size: 2rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .modal-stats {
+            margin-top: var(--space-xl);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        /* ===== 10. FOOTER ===== */
+        footer {
+            background: var(--bg-secondary);
+            padding: var(--space-xxl) 0 var(--space-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-secondary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* ===== CREDITS SECTION ===== */
+        .credits {
+            background: var(--bg-primary);
+            padding: var(--space-md) 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* ===== 11. RESPONSIVE DESIGN ===== */
+        @media (max-width: 1024px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: var(--space-xl);
+            }
+
+            .modal-body {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+
+            .command-items {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+
+            .patreon-plans {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+
+            .plan-card.popular {
+                transform: none;
+            }
+
+            .plan-card.popular:hover {
+                transform: translateY(-8px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--bg-card);
+                flex-direction: column;
+                padding: var(--space-md);
+                border-top: 1px solid var(--border-color);
+                box-shadow: 0 10px 30px var(--shadow-color);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+            }
+
+            .hero-cta .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .rates-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .character-card {
+                margin: 0 auto;
+                max-width: 300px;
+            }
+
+            .patreon-content {
+                padding: var(--space-xl) var(--space-lg);
+            }
+
+            .social-icon {
+                width: 70px;
+                height: 70px;
+            }
+
+            .gameplay-images {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 var(--space-md);
+            }
+
+            .section {
+                padding: var(--space-xl) 0;
+            }
+
+            .generation-filter,
+            .commands-tabs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-btn,
+            .tab-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .modal-body {
+                padding: var(--space-lg);
+            }
+
+            .modal-main-image {
+                height: 300px;
+            }
+
+            .social-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .plan-card {
+                padding: var(--space-lg);
+            }
+
+            .command-items {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav class="container nav-container">
+            <a href="#home" class="logo">
+                <img src="https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/lookism%20bot%20logo.png" alt="Lookism Bot Logo" class="logo-img">
+                <span class="logo-accent">LOOKISM</span> RPG BOT
+            </a>
+
+            <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-menu">
+                ☰
+            </button>
+
+            <ul class="nav-links" id="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#bot-card">Bot Status</a></li>
+                <li><a href="#gameplay">Gameplay</a></li>
+                <li><a href="#characters">Characters</a></li>
+                <li><a href="#commands">Commands</a></li>
+                <li><a href="#pull-rates">Pull Rates</a></li>
+                <li><a href="#patreon">Support</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Global Search -->
+    <div class="global-search">
+        <div class="container">
+            <div class="search-container">
+                <div class="search-icon">🔍</div>
+                <input type="text" class="search-input" placeholder="Search characters, commands, or mechanics..." id="global-search">
+                <div class="search-results" id="search-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero section">
+        <div class="container hero-container">
+            <div class="hero-content">
+                <h1>LOOKISM RPG BOT</h1>
+                <p class="hero-tagline">Experience the ultimate Discord gacha RPG based on the hit manhwa. Collect, battle, and build your crew in an immersive anime adventure.</p>
+                <div class="hero-cta">
+                    <a href="https://discord.gg/bkjurVrFs" class="btn btn-primary" target="_blank" rel="noopener">
+                        Join Discord
+                    </a>
+                    <a href="#characters" class="btn btn-secondary">
+                        View Characters
+                    </a>
+                    <a href="#commands" class="btn btn-secondary">
+                        Commands
+                    </a>
+                </div>
+                <div class="social-icons">
+                    <a href="https://discord.gg/bkjurVrFs" class="social-icon" target="_blank" rel="noopener" aria-label="Discord">
+                        <img src="https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/Icons/Discord/704867-middle.png" alt="Discord">
+                    </a>
+                    <a href="https://www.instagram.com/lookismbot.official" class="social-icon" target="_blank" rel="noopener" aria-label="Instagram">
+                        <img src="https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/Icons/Instagram/5f5ae5307d123c61a9b897a331c37906.jpg" alt="Instagram">
+                    </a>
+                    <a href="https://youtube.com/@lookismbot" class="social-icon" target="_blank" rel="noopener" aria-label="YouTube">
+                        <img src="https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/new-youtube-logo-2017-vector-for-free-download-115739248166e5taxeswn.png" alt="YouTube">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bot Card Section -->
+    <section id="bot-card" class="bot-card-section section">
+        <div class="container bot-card-container">
+            <div class="bot-mockup">
+                <div class="mockup-header">
+                    <div class="mockup-avatar">LB</div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-primary);">LookismBot</div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">Online • Ready to Play</div>
+                    </div>
+                </div>
+                <div class="mockup-content">
+                    <div style="color: var(--accent-secondary); font-weight: 600; margin-bottom: var(--space-sm);">🎮 Welcome to Lookism RPG!</div>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-sm);">
+                        Start your journey with <code style="color: var(--accent-primary);">ls start</code> to create your character!
+                    </p>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                        Use <code style="color: var(--accent-secondary);">ls pull</code> to summon characters and build your ultimate team!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gameplay Section -->
+    <section id="gameplay" class="gameplay-section section">
+        <div class="container">
+            <h2 class="text-center">🎮 Gameplay Overview</h2>
+            
+            <div class="gameplay-content">
+                <p><strong>Welcome to the official Lookism RPG Bot.</strong></p>
+                
+                <p>This is an <strong>in-development Discord RPG</strong> inspired by the Lookism universe, focused on character collection, combat, and long-term progression.</p>
+                
+                <p>From character pulls and PvP battles to gangs, crews, raids, and economy systems — this is where the world of Lookism starts taking shape.</p>
+                
+                <h3>🧍 Character System</h3>
+                <p>Characters are the core of the game.</p>
+                <ul>
+                    <li>Gacha-based character pulls inspired by the Lookism universe</li>
+                    <li>Each character is a <strong>collectible card</strong></li>
+                    <li>Characters differ in rarity, strength, and future potential</li>
+                    <li>More depth, abilities, and passives will be added over time</li>
+                </ul>
+                
+                <h3>⚔️ PvP & Battles</h3>
+                <p>Combat features are actively being expanded.</p>
+                <ul>
+                    <li>PvP battles against other players</li>
+                    <li>Team-based fights</li>
+                    <li>Future content includes raids and advanced mechanics</li>
+                </ul>
+                <p>Balance updates are ongoing during development.</p>
+                
+                <h3>🏴 Gangs, Crews & Control</h3>
+                <p>This is not a just a solo experience.</p>
+                <ul>
+                    <li>Join or create gangs and crews</li>
+                    <li>Team up with other players</li>
+                    <li>Territory control and gang competition planned for future updates</li>
+                </ul>
+                
+                <h3>💰 Economy & Progression</h3>
+                <p>Progression is tied to the in-game economy.</p>
+                <ul>
+                    <li>Earn currency through gameplay</li>
+                    <li>Spend on pulls, upgrades, and progression systems</li>
+                    <li>Open chests and collect rewards</li>
+                </ul>
+                
+                <h3>📈 Ongoing Development</h3>
+                <p>The Lookism RPG Bot is a <strong>work in progress</strong>.</p>
+                <ul>
+                    <li>Frequent updates</li>
+                    <li>Expanding character pool</li>
+                    <li>New mechanics and features planned</li>
+                </ul>
+                <p>More content will be revealed as development continues.</p>
+            </div>
+            
+            <h3 class="text-center" style="margin-top: var(--space-xxl);">Gameplay Images</h3>
+            <div class="gameplay-images">
+                <div class="gameplay-image-container">
+                    <img src="https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/gameplay%201.jpg" alt="Gameplay Image 1" class="gameplay-image">
+                </div>
+                <div class="gameplay-image-container">
+                    <img src="https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/gameplay%202.jpg" alt="Gameplay Image 2" class="gameplay-image">
+                </div>
+                <div class="gameplay-image-container">
+                    <img src="https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/gameplay%203.jpg" alt="Gameplay Image 3" class="gameplay-image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Characters Section -->
+    <section id="characters" class="characters-section section">
+        <div class="container">
+            <h2 class="text-center">CHARACTER COLLECTION</h2>
+            
+            <div class="generation-filter" id="generation-filter">
+                <button class="filter-btn active" data-generation="all">All Generations</button>
+                <button class="filter-btn" data-generation="pre">Pre-Gen</button>
+                <button class="filter-btn" data-generation="1st">1st Generation</button>
+                <button class="filter-btn" data-generation="2nd">2nd Generation</button>
+            </div>
+
+            <div class="characters-grid" id="characters-grid">
+                <!-- Characters will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Commands Section -->
+    <section id="commands" class="commands-section section">
+        <div class="container">
+            <h2 class="text-center">COMMANDS HUB</h2>
+            
+            <div class="commands-tabs" id="commands-tabs">
+                <button class="tab-btn active" data-category="all">All Commands</button>
+                <button class="tab-btn" data-category="gacha">Gacha</button>
+                <button class="tab-btn" data-category="combat">Combat</button>
+                <button class="tab-btn" data-category="economy">Economy</button>
+                <button class="tab-btn" data-category="exploration">Exploration</button>
+                <button class="tab-btn" data-category="gang">Gang</button>
+                <button class="tab-btn" data-category="crew">Crew</button>
+                <button class="tab-btn" data-category="raids">Raids</button>
+                <button class="tab-btn" data-category="utility">Utility</button>
+            </div>
+
+            <div class="commands-list" id="commands-list">
+                <!-- Commands will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Pull Rates Section -->
+    <section id="pull-rates" class="pull-rates-section section">
+        <div class="container">
+            <h2 class="text-center">PULL RATES</h2>
+            
+            <div class="rates-container">
+                <div class="rates-grid">
+                    <div class="rate-card" style="--rarity-color: var(--ur-color); border-color: var(--ur-color);">
+                        <div class="rate-rarity" style="color: var(--ur-color);">UR</div>
+                        <div class="rate-percentage">0.25%</div>
+                    </div>
+                    <div class="rate-card" style="--rarity-color: var(--ssr-color); border-color: var(--ssr-color);">
+                        <div class="rate-rarity" style="color: var(--ssr-color);">SSR</div>
+                        <div class="rate-percentage">0.75%</div>
+                    </div>
+                    <div class="rate-card" style="--rarity-color: var(--sss-color); border-color: var(--sss-color);">
+                        <div class="rate-rarity" style="color: var(--sss-color);">SSS</div>
+                        <div class="rate-percentage">3%</div>
+                    </div>
+                    <div class="rate-card" style="--rarity-color: var(--ss-color); border-color: var(--ss-color);">
+                        <div class="rate-rarity" style="color: var(--ss-color);">SS</div>
+                        <div class="rate-percentage">5%</div>
+                    </div>
+                    <div class="rate-card" style="--rarity-color: var(--s-color); border-color: var(--s-color);">
+                        <div class="rate-rarity" style="color: var(--s-color);">S</div>
+                        <div class="rate-percentage">7%</div>
+                    </div>
+                    <div class="rate-card" style="--rarity-color: var(--a-color); border-color: var(--a-color);">
+                        <div class="rate-rarity" style="color: var(--a-color);">A</div>
+                        <div class="rate-percentage">20%</div>
+                    </div>
+                    <div class="rate-card" style="--rarity-color: var(--b-color); border-color: var(--b-color);">
+                        <div class="rate-rarity" style="color: var(--b-color);">B</div>
+                        <div class="rate-percentage">30%</div>
+                    </div>
+                    <div class="rate-card" style="--rarity-color: var(--c-color); border-color: var(--c-color);">
+                        <div class="rate-rarity" style="color: var(--c-color);">C</div>
+                        <div class="rate-percentage">33%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Patreon Section -->
+    <section id="patreon" class="patreon-section section">
+        <div class="container">
+            <h2 class="text-center">PREMIUM MEMBERSHIPS</h2>
+            
+            <div class="patreon-header">
+                <div class="patreon-tagline">Dominate the Arena</div>
+                <p class="patreon-intro">
+                    Your support means everything to us! Running and maintaining this bot takes countless hours of development, server costs, and dedication. Every premium subscription helps us keep the lights on, bring you exciting new features, and ensure the bot stays online 24/7 for everyone to enjoy.
+                </p>
+                <p class="patreon-intro">
+                    All subscriptions last 30 days and can be renewed anytime. Payments and perks are handled <strong>inside the Discord bot</strong>.
+                </p>
+            </div>
+
+            <div class="patreon-plans">
+                <!-- Basic Plan -->
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <div class="plan-name">Basic</div>
+                        <div class="plan-price">€3</div>
+                        <div class="plan-period">per month</div>
+                    </div>
+                    
+                    <ul class="plan-features">
+                        <li class="plan-feature">Premium Role in Support Server</li>
+                        <li class="plan-feature">20% more experience from all activities</li>
+                        <li class="plan-feature">3 daily gacha rolls</li>
+                        <li class="plan-feature">Reduced cooldown on commands</li>
+                        <li class="plan-feature">Special thank you in the credits</li>
+                    </ul>
+                    
+                    <div class="plan-cta">
+                        <a href="https://discord.gg/bkjurVrFs" target="_blank" rel="noopener" style="text-decoration: none;">
+                            <button class="btn btn-primary" style="width: 100%;">
+                                Subscribe Now
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Standard Plan (Most Popular) -->
+                <div class="plan-card popular">
+                    <div class="popular-badge">MOST POPULAR</div>
+                    <div class="plan-header">
+                        <div class="plan-name">Standard</div>
+                        <div class="plan-price">€7</div>
+                        <div class="plan-period">per month</div>
+                    </div>
+                    
+                    <ul class="plan-features">
+                        <li class="plan-feature">All Basic plan benefits</li>
+                        <li class="plan-feature">20% off on character evolving</li>
+                        <li class="plan-feature">5,000 yen every bundle</li>
+                        <li class="plan-feature">One random crate (Locker loot or 2nd tier crate)</li>
+                        <li class="plan-feature">-2 hour quest cooldown (ST)</li>
+                        <li class="plan-feature">1 ticket (10% Vasco, 15% Zack, 75% Jace)</li>
+                        <li class="plan-feature">Priority support responses</li>
+                    </ul>
+                    
+                    <div class="plan-cta">
+                        <a href="https://discord.gg/bkjurVrFs" target="_blank" rel="noopener" style="text-decoration: none;">
+                            <button class="btn btn-primary" style="width: 100%; background: linear-gradient(135deg, var(--accent-primary), #ff00ff);">
+                                Subscribe Now
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Premium Plan -->
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <div class="plan-name">Premium</div>
+                        <div class="plan-price">€15</div>
+                        <div class="plan-period">per month</div>
+                    </div>
+                    
+                    <ul class="plan-features">
+                        <li class="plan-feature">All Standard plan benefits</li>
+                        <li class="plan-feature">50% more experience gain</li>
+                        <li class="plan-feature">10 daily gacha rolls</li>
+                        <li class="plan-feature">Exclusive premium-only events</li>
+                        <li class="plan-feature">Monthly legendary character guarantee</li>
+                        <li class="plan-feature">Custom commands (up to 3)</li>
+                        <li class="plan-feature">Direct developer access</li>
+                        <li class="plan-feature">Voting rights on new features</li>
+                    </ul>
+                    
+                    <div class="plan-cta">
+                        <a href="https://discord.gg/bkjurVrFs" target="_blank" rel="noopener" style="text-decoration: none;">
+                            <button class="btn btn-primary" style="width: 100%;">
+                                Subscribe Now
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: var(--space-xxl); color: var(--text-muted); font-size: 0.875rem; position: relative; z-index: 1;">
+                <p>All subscriptions are processed through Discord. Cancel anytime. No refunds for partial months.</p>
+            </div>
+        </div>
+    </section>
+
+    
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-logo">LOOKISM RPG BOT</div>
+                    <p style="color: var(--text-secondary);">
+                        An immersive Discord RPG gacha experience based on the Lookism universe.
+                    </p>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: var(--space-md); color: var(--text-primary);">Quick Links</h4>
+                    <div class="footer-links">
+                        <a href="#home">Home</a>
+                        <a href="#bot-card">Bot Status</a>
+                        <a href="#gameplay">Gameplay</a>
+                        <a href="#characters">Characters</a>
+                        <a href="#commands">Commands</a>
+                        <a href="#pull-rates">Pull Rates</a>
+                        <a href="#patreon">Support</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: var(--space-md); color: var(--text-primary);">Community</h4>
+                    <div class="footer-links">
+                        <a href="https://discord.gg/bkjurVrFs" target="_blank" rel="noopener">Discord Server</a>
+                        <a href="https://www.instagram.com/lookismbot.official" target="_blank" rel="noopener">Instagram</a>
+                        <a href="https://youtube.com/@lookismbot" target="_blank" rel="noopener">YouTube</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Lookism RPG Bot. This is an unofficial fan project. Lookism is a registered trademark of its respective owners.</p>
+                <p style="margin-top: var(--space-sm);">Not affiliated with PT. Lookism Entertainment or any official Lookism representatives.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Credits Section -->
+    <div class="credits">
+        <div class="container">
+            <p>Credits<br>~Site made by Tanish.</p>
+        </div>
+    </div>
+
+    <script>
+        // ===== COMPLETE CHARACTER DATA =====
+        
+        const characters = [
+            // ===== PRE-GEN CHARACTERS =====
+            {
+                id: "gapryong-kim",
+                name: "Gapryong Kim",
+                generation: "Pre-Gen",
+                rarity: "UR",
+                rarityColor: "var(--ur-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Kim%20gapryong/kim-gapryong-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Kim%20gapryong/kim-gapryong-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Kim%20gapryong/kim-gapryong-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Kim%20gapryong/kim-gapryong-4.webp"
+                ]
+            },
+            {
+                id: "elite-charles-choi",
+                name: "Elite Charles Choi",
+                generation: "Pre-Gen",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Elite-charles-choi/Elite-charles-choi-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Elite-charles-choi/Elite-charles-choi-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Elite-charles-choi/Elite-charles-choi-3.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Elite-charles-choi/Elite-charles-choi-4.jpg"
+                ]
+            },
+            {
+                id: "jinyeong-park",
+                name: "Jinyeong Park",
+                generation: "Pre-Gen",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Jinyeong-park/Jinyeong-park-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Jinyeong-park/Jinyeong-park-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Jinyeong-park/Jinyeong-park-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Jinyeong-park/Jinyeong-park-4.webp"
+                ]
+            },
+            {
+                id: "tom-lee",
+                name: "Tom Lee",
+                generation: "Pre-Gen",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Tom-Lee/Tom-Lee-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Tom-Lee/Tom-Lee-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Tom-Lee/Tom-Lee-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Tom-Lee/Tom-Lee-4.jpg"
+                ]
+            },
+            {
+                id: "baekho-kwon",
+                name: "Baekho Kwon",
+                generation: "Pre-Gen",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Baekho-kwon/Baekho-kwon-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Baekho-kwon/Baekho-kwon-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Baekho-kwon/Baekho-kwon-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Baekho-kwon/Baekho-kwon-4.webp"
+                ]
+            },
+            {
+                id: "noh-bakgu",
+                name: "Noh Bakgu",
+                generation: "Pre-Gen",
+                rarity: "S",
+                rarityColor: "var(--s-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Noh-bakgu/Noh-bakgu-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Noh-bakgu/Noh-bakgu-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Noh-bakgu/Noh-bakgu-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Noh-bakgu/Noh-bakgu-4.jpg"
+                ]
+            },
+            {
+                id: "bongae-choi",
+                name: "Bongae Choi",
+                generation: "Pre-Gen",
+                rarity: "S",
+                rarityColor: "var(--s-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Bongae-choi/Bongae-choi-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Bongae-choi/Bongae-choi-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Bongae-choi/Bongae-choi-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Bongae-choi/Bongae-choi-4.png"
+                ]
+            },
+            {
+                id: "gentleman",
+                name: "Gentleman",
+                generation: "Pre-Gen",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gentleman/Gentleman-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gentleman/Gentleman-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gentleman/Gentleman-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gentleman/Gentleman-4.webp"
+                ]
+            },
+            {
+                id: "minsik-choi",
+                name: "Minsik Choi",
+                generation: "Pre-Gen",
+                rarity: "S",
+                rarityColor: "var(--s-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Minsik-choi/Minsik-choi-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Minsik-choi/Minsik-choi-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Minsik-choi/Minsik-choi-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Minsik-choi/Minsik-choi-4.jpg"
+                ]
+            },
+            {
+                id: "jaesu-noh",
+                name: "Jaesu Noh",
+                generation: "Pre-Gen",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Jaesu-noh/Jaesu-noh-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Jaesu-noh/Jaesu-noh-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Jaesu-noh/Jaesu-noh-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Jaesu-noh/Jaesu-noh-4.jpg"
+                ]
+            },
+            {
+                id: "gwang-yu",
+                name: "Gwang Yu",
+                generation: "Pre-Gen",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gwang-yu/Gwang-yu-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gwang-yu/Gwang-yu-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gwang-yu/Gwang-yu-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gwang-yu/Gwang-yu-4.png"
+                ]
+            },
+            {
+                id: "beolgu-lee",
+                name: "Beolgu Lee",
+                generation: "Pre-Gen",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Beolgu-lee/Beolgu-lee-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Beolgu-lee/Beolgu-lee-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Beolgu-lee/Beolgu-lee-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Beolgu-lee/Beolgu-lee-4.webp"
+                ]
+            },
+            {
+                id: "shigen-yamazaki",
+                name: "Shigen Yamazaki",
+                generation: "Pre-Gen",
+                rarity: "UR",
+                rarityColor: "var(--ur-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shigen-yamazaki/Shigen-yamazaki-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shigen-yamazaki/Shigen-yamazaki-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shigen-yamazaki/Shigen-yamazaki-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shigen-yamazaki/Shigen-yamazaki-4.webp"
+                ]
+            },
+            {
+                id: "shintaro-yamazaki",
+                name: "Shintaro Yamazaki",
+                generation: "Pre-Gen",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shintaro-yamazaki/Shintaro-yamazaki-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shintaro-yamazaki/Shintaro-yamazaki-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shintaro-yamazaki/Shintaro-yamazaki-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shintaro-yamazaki/Shintaro-yamazaki-4.webp"
+                ]
+            },
+            {
+                id: "shigeaki-kojima",
+                name: "Shigeaki Kojima",
+                generation: "Pre-Gen",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shigen-yamazaki/Shigen-yamazaki-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shigen-yamazaki/Shigen-yamazaki-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shigen-yamazaki/Shigen-yamazaki-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Shigen-yamazaki/Shigen-yamazaki-4.webp"
+                ]
+            },
+            {
+                id: "mujin-jin",
+                name: "Mujin Jin",
+                generation: "Pre-Gen",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Mujin-jin/Mujin-jin-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Mujin-jin/Mujin-jin-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Mujin-jin/Mujin-jin-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Mujin-jin/Mujin-jin-4.jpg"
+                ]
+            },
+            {
+                id: "brekdak",
+                name: "Brekdak",
+                generation: "Pre-Gen",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Brekdak/Brekdak-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Brekdak/Brekdak-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Brekdak/Brekdak-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Brekdak/Brekdak-4.webp"
+                ]
+            },
+            {
+                id: "pacheon-jo",
+                name: "Pacheon Jo",
+                generation: "Pre-Gen",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Pacheon-jo/Pacheon-jo-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Pacheon-jo/Pacheon-jo-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Pacheon-jo/Pacheon-jo-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Pacheon-jo/Pacheon-jo-4.webp"
+                ]
+            },
+            {
+                id: "gon-kwon",
+                name: "Gon Kwon",
+                generation: "Pre-Gen",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gon-Kwon/Gon-Kwon-1.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gon-Kwon/Gon-Kwon-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gon-Kwon/Gon-Kwon-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/pre-gen/Gon-Kwon/Gon-Kwon-4.webp"
+                ]
+            },
+
+            // ===== 1ST GENERATION CHARACTERS =====
+            {
+                id: "kitae-kim",
+                name: "Kitae Kim",
+                generation: "1st Generation",
+                rarity: "SSR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Kitae-Kim/Kitae-Kim-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Kitae-Kim/Kitae-Kim-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Kitae-Kim/Kitae-Kim-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Kitae-Kim/Kitae-Kim-4.jpg"
+                ]
+            },
+            {
+                id: "james-lee",
+                name: "James Lee",
+                generation: "1st Generation",
+                rarity: "SSR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/James-Lee/James-Lee-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/James-Lee/James-Lee-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/James-Lee/James-Lee-3.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/James-Lee/James-Lee-4.jpg"
+                ]
+            },
+            {
+                id: "jichang-kwak",
+                name: "Jichang Kwak",
+                generation: "1st Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jichang-kwak/Jichang-kwak-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jichang-kwak/Jichang-kwak-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jichang-kwak/Jichang-kwak-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jichang-kwak/Jichang-kwak-4.webp"
+                ]
+            },
+            {
+                id: "seong-jiyuk",
+                name: "Seong Jiyuk",
+                generation: "1st Generation",
+                rarity: "SSR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Seong-jiyuk/Seong-jiyuk-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Seong-jiyuk/Seong-jiyuk-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Seong-jiyuk/Seong-jiyuk-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Seong-jiyuk/Seong-jiyuk-4.png"
+                ]
+            },
+            {
+                id: "taesoo-ma",
+                name: "Taesoo Ma",
+                generation: "1st Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Taesoo-ma/Taesoo-ma-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Taesoo-ma/Taesoo-ma-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Taesoo-ma/Taesoo-ma-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Taesoo-ma/Taesoo-ma-4.webp"
+                ]
+            },
+            {
+                id: "gongseob-ji",
+                name: "Gongseob Ji",
+                generation: "1st Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Gongseob-Ji/Gongseob-Ji-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Gongseob-Ji/Gongseob-Ji-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Gongseob-Ji/Gongseob-Ji-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Gongseob-Ji/Gongseob-Ji-4.webp"
+                ]
+            },
+            {
+                id: "jinrang",
+                name: "Jinrang",
+                generation: "1st Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jinrang/Jinrang-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jinrang/Jinrang-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jinrang/Jinrang-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jinrang/Jinrang-4.png"
+                ]
+            },
+            {
+                id: "jaegyeon-na",
+                name: "Jaegyeon Na",
+                generation: "1st Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jaegyeon-na/Jaegyeon-na-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jaegyeon-na/Jaegyeon-na-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jaegyeon-na/Jaegyeon-na-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Jaegyeon-na/Jaegyeon-na-4.jpg"
+                ]
+            },
+            {
+                id: "yujae-seon",
+                name: "Yujae Seon",
+                generation: "1st Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Yujae-seon/Yujae-seon-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Yujae-seon/Yujae-seon-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Yujae-seon/Yujae-seon-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Yujae-seon/Yujae-seon-4.jpg"
+                ]
+            },
+            {
+                id: "seokdu-wang",
+                name: "Seokdu Wang",
+                generation: "1st Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Seokdu-wang/Seokdu-wang-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Seokdu-wang/Seokdu-wang-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Seokdu-wang/Seokdu-wang-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Seokdu-wang/Seokdu-wang-4.webp"
+                ]
+            },
+            {
+                id: "byeon-kim",
+                name: "Byeon Kim",
+                generation: "1st Generation",
+                rarity: "S",
+                rarityColor: "var(--s-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Byeon-Kim/Byeon-Kim-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Byeon-Kim/Byeon-Kim-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Byeon-Kim/Byeon-Kim-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Byeon-Kim/Byeon-Kim-4.webp"
+                ]
+            },
+            {
+                id: "gun-park",
+                name: "Gun Park",
+                generation: "1st Generation",
+                rarity: "UR",
+                rarityColor: "var(--ur-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Gun-park/Gun-park-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Gun-park/Gun-park-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Gun-park/Gun-park-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Gun-park/Gun-park-4.webp"
+                ]
+            },
+            {
+                id: "goo-kim",
+                name: "Goo Kim",
+                generation: "1st Generation",
+                rarity: "SSR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Goo-kim/Goo-kim-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Goo-kim/Goo-kim-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Goo-kim/Goo-kim-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Goo-kim/Goo-kim-4.webp"
+                ]
+            },
+            {
+                id: "kouji",
+                name: "Kouji",
+                generation: "1st Generation",
+                rarity: "A",
+                rarityColor: "var(--a-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Kouji/Kouji-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Kouji/Kouji-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Kouji/Kouji-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/1st-gen/Kouji/Kouji-4.png"
+                ]
+            },
+
+            // ===== 2ND GENERATION CHARACTERS =====
+            // 2nd Gen Part 1
+            {
+                id: "brad-lee",
+                name: "Brad Lee",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Brad-lee/Brad-lee-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Brad-lee/Brad-lee-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Brad-lee/Brad-lee-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Brad-lee/Brad-lee-4.webp"
+                ]
+            },
+            {
+                id: "crystal-choi",
+                name: "Crystal Choi",
+                generation: "2nd Generation",
+                rarity: "B",
+                rarityColor: "var(--b-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Crystal-Choi/Crystal-Choi-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Crystal-Choi/Crystal-Choi-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Crystal-Choi/Crystal-Choi-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Crystal-Choi/Crystal-Choi-4.jpg"
+                ]
+            },
+            {
+                id: "darius-hong",
+                name: "Darius Hong",
+                generation: "2nd Generation",
+                rarity: "B",
+                rarityColor: "var(--b-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Darius-Hong/Darius-Hong-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Darius-Hong/Darius-Hong-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Darius-Hong/Darius-Hong-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Darius-Hong/Darius-Hong-4.webp"
+                ]
+            },
+            {
+                id: "derek-jo",
+                name: "Derek Jo",
+                generation: "2nd Generation",
+                rarity: "A",
+                rarityColor: "var(--a-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Derek-jo/Derek-jo-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Derek-jo/Derek-jo-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Derek-jo/Derek-jo-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Derek-jo/Derek-jo-4.jpg"
+                ]
+            },
+            {
+                id: "doo-lee",
+                name: "Doo Lee",
+                generation: "2nd Generation",
+                rarity: "A",
+                rarityColor: "var(--a-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Doo-lee/Doo-lee-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Doo-lee/Doo-lee-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Doo-lee/Doo-lee-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Doo-lee/Doo-lee-4.png"
+                ]
+            },
+            {
+                id: "duke-pyeon",
+                name: "Duke Pyeon",
+                generation: "2nd Generation",
+                rarity: "B",
+                rarityColor: "var(--b-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Duke-pyeon/Duke-pyeon-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Duke-pyeon/Duke-pyeon-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Duke-pyeon/Duke-pyeon-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Duke-pyeon/Duke-pyeon-4.jpg"
+                ]
+            },
+            {
+                id: "eli-jang",
+                name: "Eli Jang",
+                generation: "2nd Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Eli-Jang/Eli-Jang-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Eli-Jang/Eli-Jang-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Eli-Jang/Eli-Jang-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Eli-Jang/Eli-Jang-4.jpg"
+                ]
+            },
+            {
+                id: "ethan-hwang",
+                name: "Ethan Hwang",
+                generation: "2nd Generation",
+                rarity: "S",
+                rarityColor: "var(--s-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Ethan-Hwang/Ethan-Hwang-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Ethan-Hwang/Ethan-Hwang-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Ethan-Hwang/Ethan-Hwang-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Ethan-Hwang/Ethan-Hwang-4.webp"
+                ]
+            },
+            {
+                id: "eugene",
+                name: "Eugene",
+                generation: "2nd Generation",
+                rarity: "A",
+                rarityColor: "var(--a-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Eugene/Eugene-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Eugene/Eugene-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Eugene/Eugene-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Eugene/Eugene-4.jpg"
+                ]
+            },
+            {
+                id: "hangyeoul-baek",
+                name: "Hangyeoul Baek",
+                generation: "2nd Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hangyeoul-Baek/Hangyeoul-Baek-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hangyeoul-Baek/Hangyeoul-Baek-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hangyeoul-Baek/Hangyeoul-Baek-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hangyeoul-Baek/Hangyeoul-Baek-4.jpg"
+                ]
+            },
+            {
+                id: "hiroaki-kojima",
+                name: "Hiroaki Kojima",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hiroaki-kojima/Hiroaki-kojima-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hiroaki-kojima/Hiroaki-kojima-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hiroaki-kojima/Hiroaki-kojima-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hiroaki-kojima/Hiroaki-kojima-4.jpg"
+                ]
+            },
+            {
+                id: "hudson-ahn",
+                name: "Hudson Ahn",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hudson-Ahn/Hudson-Ahn-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hudson-Ahn/Hudson-Ahn-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hudson-Ahn/Hudson-Ahn-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hudson-Ahn/Hudson-Ahn-4.jpg"
+                ]
+            },
+            {
+                id: "hwang-ho",
+                name: "Hwang Ho",
+                generation: "2nd Generation",
+                rarity: "C",
+                rarityColor: "var(--c-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hwang-Ho/Hwang-Ho-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hwang-Ho/Hwang-Ho-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hwang-Ho/Hwang-Ho-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hwang-Ho/Hwang-Ho-4.webp"
+                ]
+            },
+            {
+                id: "hyun-sangjin",
+                name: "Hyun Sangjin",
+                generation: "2nd Generation",
+                rarity: "S",
+                rarityColor: "var(--s-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hyun-Sangjin/Hyun-Sangjin-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hyun-Sangjin/Hyun-Sangjin-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hyun-Sangjin/Hyun-Sangjin-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Hyun-Sangjin/Hyun-Sangjin-4.webp"
+                ]
+            },
+            {
+                id: "jacky-lee",
+                name: "Jacky Lee",
+                generation: "2nd Generation",
+                rarity: "B",
+                rarityColor: "var(--b-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jacky-Lee/Jacky-Lee-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jacky-Lee/Jacky-Lee-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jacky-Lee/Jacky-Lee-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jacky-Lee/Jacky-Lee-4.jpg"
+                ]
+            },
+            {
+                id: "jaewoo",
+                name: "Jaewoo",
+                generation: "2nd Generation",
+                rarity: "A",
+                rarityColor: "var(--a-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jaewoo/Jaewoo-1.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jaewoo/Jaewoo-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jaewoo/Jaewoo-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jaewoo/Jaewoo-4.jpg"
+                ]
+            },
+            {
+                id: "jake-kim",
+                name: "Jake Kim",
+                generation: "2nd Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jake-Kim/Jake-Kim-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jake-Kim/Jake-Kim-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jake-Kim/Jake-Kim-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jake-Kim/Jake-Kim-4.webp"
+                ]
+            },
+            {
+                id: "jason-yoon",
+                name: "Jason Yoon",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jason-Yoon/Jason-Yoon-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jason-Yoon/Jason-Yoon-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jason-Yoon/Jason-Yoon-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/Jason-Yoon/Jason-Yoon-4.jpg"
+                ]
+            },
+            {
+                id: "jace-park",
+                name: "Jace Park",
+                generation: "2nd Generation",
+                rarity: "B",
+                rarityColor: "var(--b-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/jace-park/jace-park-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/jace-park/jace-park-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/jace-park/jace-park-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-1/jace-park/jace-park-4.jpg"
+                ]
+            },
+
+            // 2nd Gen Part 2
+            {
+                id: "jay",
+                name: "Jay",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jay/Jay-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jay/Jay-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jay/Jay-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jay/Jay-4.jpg"
+                ]
+            },
+            {
+                id: "jerry-kwon",
+                name: "Jerry Kwon",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jerry-Kwon/Jerry-Kwon-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jerry-Kwon/Jerry-Kwon-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jerry-Kwon/Jerry-Kwon-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jerry-Kwon/Jerry-Kwon-4.jpg"
+                ]
+            },
+            {
+                id: "jibeom",
+                name: "Jibeom",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jibeom/Jibeom-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jibeom/Jibeom-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jibeom/Jibeom-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jibeom/Jibeom-4.webp"
+                ]
+            },
+            {
+                id: "jiho-park",
+                name: "Jiho Park",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jiho-park/Jiho-park-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jiho-park/Jiho-park-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jiho-park/Jiho-park-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jiho-park/Jiho-park-4.jpg"
+                ]
+            },
+            {
+                id: "jin-jang",
+                name: "Jin Jang",
+                generation: "2nd Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jin-Jang/Jin-Jang-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jin-Jang/Jin-Jang-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jin-Jang/Jin-Jang-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Jin-Jang/Jin-Jang-4.webp"
+                ]
+            },
+            {
+                id: "johan",
+                name: "Johan",
+                generation: "2nd Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Johan/Johan-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Johan/Johan-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Johan/Johan-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Johan/Johan-4.jpg"
+                ]
+            },
+            {
+                id: "kang-jinchan",
+                name: "Kang Jinchan",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Kang-Jinchan/Kang-Jinchan-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Kang-Jinchan/Kang-Jinchan-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Kang-Jinchan/Kang-Jinchan-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Kang-Jinchan/Kang-Jinchan-4.jpg"
+                ]
+            },
+            {
+                id: "kenta",
+                name: "Kenta",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Kenta/Kenta-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Kenta/Kenta-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Kenta/Kenta-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Kenta/Kenta-4.jpg"
+                ]
+            },
+            {
+                id: "lineman",
+                name: "Lineman",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Lineman/Lineman-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Lineman/Lineman-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Lineman/Lineman-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Lineman/Lineman-4.webp"
+                ]
+            },
+            {
+                id: "logan-lee",
+                name: "Logan Lee",
+                generation: "2nd Generation",
+                rarity: "S",
+                rarityColor: "var(--s-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Logan-Lee/Logan-Lee-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Logan-Lee/Logan-Lee-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Logan-Lee/Logan-Lee-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Logan-Lee/Logan-Lee-4.jpg"
+                ]
+            },
+            {
+                id: "lua-lim",
+                name: "Lua Lim",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Lua-Lim/Lua-Lim-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Lua-Lim/Lua-Lim-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Lua-Lim/Lua-Lim-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Lua-Lim/Lua-Lim-4.png"
+                ]
+            },
+            {
+                id: "manager-kim",
+                name: "Manager Kim",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Manager-Kim/Manager-Kim-1.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Manager-Kim/Manager-Kim-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Manager-Kim/Manager-Kim-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Manager-Kim/Manager-Kim-4.jpg"
+                ]
+            },
+            {
+                id: "mandeok-bang",
+                name: "Mandeok Bang",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mandeok-Bang/Mandeok-Bang-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mandeok-Bang/Mandeok-Bang-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mandeok-Bang/Mandeok-Bang-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mandeok-Bang/Mandeok-Bang-4.jpg"
+                ]
+            },
+            {
+                id: "mary-kim",
+                name: "Mary Kim",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mary-Kim/Mary-Kim-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mary-Kim/Mary-Kim-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mary-Kim/Mary-Kim-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mary-Kim/Mary-Kim-4.webp"
+                ]
+            },
+            {
+                id: "max-kang",
+                name: "Max Kang",
+                generation: "2nd Generation",
+                rarity: "S",
+                rarityColor: "var(--s-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Max-kang/Max-kang-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Max-kang/Max-kang-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Max-kang/Max-kang-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Max-kang/Max-kang-4.webp"
+                ]
+            },
+            {
+                id: "min-jihoon",
+                name: "Min Jihoon",
+                generation: "2nd Generation",
+                rarity: "A",
+                rarityColor: "var(--a-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Min-Jihoon/Min-Jihoon-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Min-Jihoon/Min-Jihoon-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Min-Jihoon/Min-Jihoon-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Min-Jihoon/Min-Jihoon-4.jpg"
+                ]
+            },
+            {
+                id: "mira-kim",
+                name: "Mira Kim",
+                generation: "2nd Generation",
+                rarity: "C",
+                rarityColor: "var(--c-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mira-kim/Mira-kim-1.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mira-kim/Mira-kim-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mira-kim/Mira-kim-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mira-kim/Mira-kim-4.jpg"
+                ]
+            },
+            {
+                id: "mitsuki-soma",
+                name: "Mitsuki Soma",
+                generation: "2nd Generation",
+                rarity: "A",
+                rarityColor: "var(--a-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mitsuki-soma/Mitsuki-soma-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mitsuki-soma/Mitsuki-soma-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mitsuki-soma/Mitsuki-soma-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Mitsuki-soma/Mitsuki-soma-4.webp"
+                ]
+            },
+            {
+                id: "og-daniel",
+                name: "OG Daniel",
+                generation: "2nd Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Og-daniel/Og-daniel-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Og-daniel/Og-daniel-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Og-daniel/Og-daniel-3.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Og-daniel/Og-daniel-4.jpg"
+                ]
+            },
+            {
+                id: "reporter-kim",
+                name: "Reporter Kim",
+                generation: "2nd Generation",
+                rarity: "UR",
+                rarityColor: "var(--ur-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Reporter-kim/Reporter-kim-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Reporter-kim/Reporter-kim-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Reporter-kim/Reporter-kim-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-2/Reporter-kim/Reporter-kim-4.jpg"
+                ]
+            },
+
+            // 2nd Gen Part 3
+            {
+                id: "ryuhei-kuroda",
+                name: "Ryuhei Kuroda",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Ryuhei-Kuroda/Ryuhei-Kuroda-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Ryuhei-Kuroda/Ryuhei-Kuroda-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Ryuhei-Kuroda/Ryuhei-Kuroda-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Ryuhei-Kuroda/Ryuhei-Kuroda-4.jpg"
+                ]
+            },
+            {
+                id: "samuel-seo",
+                name: "Samuel Seo",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Samuel-Seo/Samuel-Seo-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Samuel-Seo/Samuel-Seo-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Samuel-Seo/Samuel-Seo-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Samuel-Seo/Samuel-Seo-4.jpg"
+                ]
+            },
+            {
+                id: "sato-kazuma",
+                name: "Sato Kazuma",
+                generation: "2nd Generation",
+                rarity: "C",
+                rarityColor: "var(--c-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sato-Kazuma/Sato-Kazuma-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sato-Kazuma/Sato-Kazuma-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sato-Kazuma/Sato-Kazuma-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sato-Kazuma/Sato-Kazuma-4.webp"
+                ]
+            },
+            {
+                id: "sb-daniel",
+                name: "SB Daniel",
+                generation: "2nd Generation",
+                rarity: "SSR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sb-daniel/Sb-daniel-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sb-daniel/Sb-daniel-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sb-daniel/Sb-daniel-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sb-daniel/Sb-daniel-4.jpg"
+                ]
+            },
+            {
+                id: "shigeaki-kojima",
+                name: "Shigeaki Kojima",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Shigeaki-kojima/Shigeaki-kojima-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Shigeaki-kojima/Shigeaki-kojima-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Shigeaki-kojima/Shigeaki-kojima-3.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Shigeaki-kojima/Shigeaki-kojima-4.webp"
+                ]
+            },
+            {
+                id: "shin-arim",
+                name: "Shin Arim",
+                generation: "2nd Generation",
+                rarity: "B",
+                rarityColor: "var(--b-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Shin-Arim/Shin-Arim-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Shin-Arim/Shin-Arim-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Shin-Arim/Shin-Arim-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Shin-Arim/Shin-Arim-4.jpg"
+                ]
+            },
+            {
+                id: "sinu-han",
+                name: "Sinu Han",
+                generation: "2nd Generation",
+                rarity: "SR",
+                rarityColor: "var(--ssr-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sinu-Han/Sinu-Han-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sinu-Han/Sinu-Han-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sinu-Han/Sinu-Han-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sinu-Han/Sinu-Han-4.webp"
+                ]
+            },
+            {
+                id: "sujin",
+                name: "Sujin",
+                generation: "2nd Generation",
+                rarity: "B",
+                rarityColor: "var(--b-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sujin/Sujin-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sujin/Sujin-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sujin/Sujin-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Sujin/Sujin-4.webp"
+                ]
+            },
+            {
+                id: "taegon-wi",
+                name: "Taegon Wi",
+                generation: "2nd Generation",
+                rarity: "SS",
+                rarityColor: "var(--ss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Taegon-wi/Taegon-wi-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Taegon-wi/Taegon-wi-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Taegon-wi/Taegon-wi-3.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Taegon-wi/Taegon-wi-4.webp"
+                ]
+            },
+            {
+                id: "taejin-cheon",
+                name: "Taejin Cheon",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Taejin-cheon/Taejin-cheon-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Taejin-cheon/Taejin-cheon-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Taejin-cheon/Taejin-cheon-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Taejin-cheon/Taejin-cheon-4.webp"
+                ]
+            },
+            {
+                id: "the-cheonliang-shaman",
+                name: "The Cheonliang Shaman",
+                generation: "2nd Generation",
+                rarity: "B",
+                rarityColor: "var(--b-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/The-cheonliang-shaman/The-cheonliang-shaman-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/The-cheonliang-shaman/The-cheonliang-shaman-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/The-cheonliang-shaman/The-cheonliang-shaman-3.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/The-cheonliang-shaman/The-cheonliang-shaman-4.jpg"
+                ]
+            },
+            {
+                id: "vasco",
+                name: "Vasco",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vasco/Vasco-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vasco/Vasco-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vasco/Vasco-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vasco/Vasco-4.jpg"
+                ]
+            },
+            {
+                id: "vin-jin",
+                name: "Vin Jin",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vin-Jin/Vin-Jin-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vin-Jin/Vin-Jin-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vin-Jin/Vin-Jin-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vin-Jin/Vin-Jin-4.jpg"
+                ]
+            },
+            {
+                id: "vivi",
+                name: "Vivi",
+                generation: "2nd Generation",
+                rarity: "B",
+                rarityColor: "var(--b-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vivi/Vivi-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vivi/Vivi-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vivi/Vivi-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Vivi/Vivi-4.webp"
+                ]
+            },
+            {
+                id: "warren-chae",
+                name: "Warren Chae",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Warren-Chae/Warren-Chae-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Warren-Chae/Warren-Chae-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Warren-Chae/Warren-Chae-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Warren-Chae/Warren-Chae-4.jpg"
+                ]
+            },
+            {
+                id: "wooseok",
+                name: "Wooseok",
+                generation: "2nd Generation",
+                rarity: "A",
+                rarityColor: "var(--a-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Wooseok/Wooseok-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Wooseok/Wooseok-2.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Wooseok/Wooseok-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Wooseok/Wooseok-4.webp"
+                ]
+            },
+            {
+                id: "xiaolung",
+                name: "Xiaolung",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Xiaolung/Xiaolung-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Xiaolung/Xiaolung-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Xiaolung/Xiaolung-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Xiaolung/Xiaolung-4.webp"
+                ]
+            },
+            {
+                id: "yeowool-ha",
+                name: "Yeowool Ha",
+                generation: "2nd Generation",
+                rarity: "UR",
+                rarityColor: "var(--ur-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Yeowool-ha/Yeowool-ha-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Yeowool-ha/Yeowool-ha-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Yeowool-ha/Yeowool-ha-3.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Yeowool-ha/Yeowool-ha-4.jpg"
+                ]
+            },
+            {
+                id: "yuseong",
+                name: "Yuseong",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Yuseong/Yuseong-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Yuseong/Yuseong-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Yuseong/Yuseong-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Yuseong/Yuseong-4.jpg"
+                ]
+            },
+            {
+                id: "zack-lee",
+                name: "Zack Lee",
+                generation: "2nd Generation",
+                rarity: "SSS",
+                rarityColor: "var(--sss-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Zack-Lee/Zack-Lee-1.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Zack-Lee/Zack-Lee-2.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Zack-Lee/Zack-Lee-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Zack-Lee/Zack-Lee-4.jpg"
+                ]
+            },
+            {
+                id: "zoe-park",
+                name: "Zoe Park",
+                generation: "2nd Generation",
+                rarity: "C",
+                rarityColor: "var(--c-color)",
+                images: [
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Zoe-park/Zoe-park-1.webp",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Zoe-park/Zoe-park-2.png",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Zoe-park/Zoe-park-3.jpg",
+                    "https://raw.githubusercontent.com/Blackdevil-Pookibear/Looksim-Website/main/2nd-gen-part-3/Zoe-park/Zoe-park-4.webp"
+                ]
+            }
+        ];
+
+        // Commands data
+        const commands = {
+            gacha: [
+                { name: "ls pull", description: "Summon new characters from the gacha system" },
+                { name: "ls multi", description: "Perform a 10x summon with guaranteed rarity" },
+                { name: "ls pity", description: "Check your pity counter for guaranteed UR" },
+                { name: "ls collection", description: "View all characters you've collected" }
+            ],
+            combat: [
+                { name: "ls fight @user", description: "Challenge another player to a duel" },
+                { name: "ls battle", description: "Start a battle against AI opponents" },
+                { name: "ls skills", description: "View and manage your character's skills" },
+                { name: "ls arena", description: "Enter the competitive arena mode" }
+            ],
+            economy: [
+                { name: "ls shop", description: "Access the in-game item shop" },
+                { name: "ls buy [item]", description: "Purchase items from the shop" },
+                { name: "ls sell [item]", description: "Sell items from your inventory" },
+                { name: "ls balance", description: "Check your current currency balance" }
+            ],
+            exploration: [
+                { name: "ls explore", description: "Explore random locations for rewards" },
+                { name: "ls dungeon", description: "Enter a dungeon for special loot" },
+                { name: "ls quests", description: "View available daily and weekly quests" },
+                { name: "ls mission", description: "Start a story mission" }
+            ],
+            gang: [
+                { name: "ls gang create", description: "Create your own gang" },
+                { name: "ls gang join", description: "Join an existing gang" },
+                { name: "ls gang info", description: "View gang information and members" },
+                { name: "ls gang war", description: "Declare war on another gang" }
+            ],
+            crew: [
+                { name: "ls crew form", description: "Form a crew with other players" },
+                { name: "ls crew invite", description: "Invite players to your crew" },
+                { name: "ls crew kick", description: "Remove a player from your crew" },
+                { name: "ls crew stats", description: "View crew statistics and rankings" }
+            ],
+            raids: [
+                { name: "ls raid start", description: "Start a raid boss encounter" },
+                { name: "ls raid join", description: "Join an ongoing raid" },
+                { name: "ls raid damage", description: "Check raid damage rankings" },
+                { name: "ls raid rewards", description: "Claim raid completion rewards" }
+            ],
+            utility: [
+                { name: "ls help", description: "Show all available commands" },
+                { name: "ls profile", description: "View your player profile" },
+                { name: "ls leaderboard", description: "View top players rankings" },
+                { name: "ls settings", description: "Configure your game settings" }
+            ]
+        };
+
+        // ===== DOM ELEMENTS =====
+        const characterGrid = document.getElementById('characters-grid');
+        const generationFilter = document.getElementById('generation-filter');
+        const commandsList = document.getElementById('commands-list');
+        const commandsTabs = document.getElementById('commands-tabs');
+        const searchInput = document.getElementById('global-search');
+        const searchResults = document.getElementById('search-results');
+        const characterModal = document.getElementById('character-modal');
+        const modalBody = document.getElementById('modal-body');
+        const navMenu = document.querySelector('.nav-links');
+        const hamburger = document.querySelector('.hamburger');
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCharacters('all');
+            renderCommands('all');
+            setupEventListeners();
+            setupScrollAnimations();
+        });
+
+        // ===== CHARACTER RENDERING =====
+        function renderCharacters(generation) {
+            characterGrid.innerHTML = '';
+            
+            const filteredCharacters = generation === 'all' 
+                ? characters 
+                : characters.filter(char => {
+                    if (generation === 'pre') return char.generation === 'Pre-Gen';
+                    if (generation === '1st') return char.generation === '1st Generation';
+                    if (generation === '2nd') return char.generation === '2nd Generation';
+                    return true;
+                });
+            
+            filteredCharacters.forEach(character => {
+                const card = document.createElement('div');
+                card.className = 'character-card fade-in';
+                card.innerHTML = `
+                    <div class="character-image-container">
+                        <div class="character-image-wrapper">
+                            ${character.images.map(img => `
+                                <img src="${img}" alt="${character.name}" class="character-image">
+                            `).join('')}
+                        </div>
+                        <div class="character-rarity" style="background: ${character.rarityColor}; color: white;">
+                            ${character.rarity}
+                        </div>
+                    </div>
+                    <div class="character-info">
+                        <div class="character-name">${character.name}</div>
+                        <div class="character-generation">${character.generation}</div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => openCharacterModal(character));
+                characterGrid.appendChild(card);
+            });
+            
+            // Trigger animation
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach(el => {
+                    el.classList.add('visible');
+                });
+            }, 100);
+        }
+
+        // ===== COMMANDS RENDERING =====
+        function renderCommands(category) {
+            commandsList.innerHTML = '';
+            
+            if (category === 'all') {
+                // Show all commands grouped by category
+                Object.entries(commands).forEach(([catName, cmdList]) => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'command-category fade-in';
+                    categoryDiv.innerHTML = `
+                        <h3>${catName.charAt(0).toUpperCase() + catName.slice(1)}</h3>
+                        <div class="command-items">
+                            ${cmdList.map(cmd => `
+                                <div class="command-item">
+                                    <div class="command-name">${cmd.name}</div>
+                                    <div class="command-desc">${cmd.description}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    commandsList.appendChild(categoryDiv);
+                });
+            } else if (commands[category]) {
+                // Show only commands from specific category
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'command-category fade-in';
+                categoryDiv.innerHTML = `
+                    <h3>${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+                    <div class="command-items">
+                        ${commands[category].map(cmd => `
+                            <div class="command-item">
+                                <div class="command-name">${cmd.name}</div>
+                                <div class="command-desc">${cmd.description}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                commandsList.appendChild(categoryDiv);
+            }
+            
+            // Trigger animation
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach(el => {
+                    el.classList.add('visible');
+                });
+            }, 100);
+        }
+
+        // ===== CHARACTER MODAL =====
+        function openCharacterModal(character) {
+            modalBody.innerHTML = `
+                <div class="modal-images">
+                    <div class="modal-main-image">
+                        <img src="${character.images[0]}" alt="${character.name}" id="modal-main-img">
+                    </div>
+                    <div class="modal-thumbnails">
+                        ${character.images.map((img, index) => `
+                            <div class="modal-thumbnail ${index === 0 ? 'active' : ''}" 
+                                 data-image="${img}"
+                                 onclick="switchModalImage('${img}', this)">
+                                <img src="${img}" alt="${character.name} ${index + 1}">
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="modal-info">
+                    <h2>${character.name}</h2>
+                    <div class="stat-item">
+                        <span class="stat-label">Generation:</span>
+                        <span class="stat-value">${character.generation}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Rarity:</span>
+                        <span class="stat-value" style="color: ${character.rarityColor}">${character.rarity}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Status:</span>
+                        <span class="stat-value">Available in Gacha</span>
+                    </div>
+                    <div style="margin-top: var(--space-xl); padding: var(--space-lg); background: var(--bg-card-light); border-radius: var(--radius-lg);">
+                        <p style="color: var(--text-secondary); font-style: italic;">
+                            "More stats and abilities revealed in-game through progression and discovery."
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            characterModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Global function for thumbnail clicks
+        window.switchModalImage = function(imageSrc, element) {
+            document.getElementById('modal-main-img').src = imageSrc;
+            document.querySelectorAll('.modal-thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            element.classList.add('active');
+        };
+
+        // ===== SEARCH FUNCTIONALITY =====
+        function performSearch(query) {
+            if (!query.trim()) {
+                searchResults.classList.remove('active');
+                return;
+            }
+            
+            const lowerQuery = query.toLowerCase();
+            const results = {
+                characters: characters.filter(char => 
+                    char.name.toLowerCase().includes(lowerQuery) ||
+                    char.generation.toLowerCase().includes(lowerQuery) ||
+                    char.rarity.toLowerCase().includes(lowerQuery)
+                ),
+                commands: []
+            };
+            
+            // Search through commands
+            Object.values(commands).forEach(category => {
+                category.forEach(cmd => {
+                    if (cmd.name.toLowerCase().includes(lowerQuery) || 
+                        cmd.description.toLowerCase().includes(lowerQuery)) {
+                        results.commands.push(cmd);
+                    }
+                });
+            });
+            
+            renderSearchResults(results);
+        }
+
+        function renderSearchResults(results) {
+            searchResults.innerHTML = '';
+            
+            if (results.characters.length > 0) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'search-category';
+                categoryDiv.innerHTML = `<h4>Characters (${results.characters.length})</h4>`;
+                
+                results.characters.forEach(char => {
+                    const item = document.createElement('div');
+                    item.className = 'search-item';
+                    item.innerHTML = `
+                        <div style="width: 30px; height: 30px; border-radius: 4px; background: ${char.rarityColor}; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: bold;">
+                            ${char.rarity}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">${char.name}</div>
+                            <div style="font-size: 0.875rem; color: var(--text-muted);">${char.generation}</div>
+                        </div>
+                    `;
+                    item.addEventListener('click', () => {
+                        openCharacterModal(char);
+                        searchResults.classList.remove('active');
+                        searchInput.value = '';
+                    });
+                    categoryDiv.appendChild(item);
+                });
+                
+                searchResults.appendChild(categoryDiv);
+            }
+            
+            if (results.commands.length > 0) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'search-category';
+                categoryDiv.innerHTML = `<h4>Commands (${results.commands.length})</h4>`;
+                
+                results.commands.forEach(cmd => {
+                    const item = document.createElement('div');
+                    item.className = 'search-item';
+                    item.innerHTML = `
+                        <div style="width: 30px; height: 30px; border-radius: 4px; background: var(--accent-primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem;">
+                            ⌨️
+                        </div>
+                        <div>
+                            <div style="font-family: monospace; font-weight: 600;">${cmd.name}</div>
+                            <div style="font-size: 0.875rem; color: var(--text-muted);">${cmd.description}</div>
+                        </div>
+                    `;
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                        document.querySelector('[data-category="all"]').classList.add('active');
+                        renderCommands('all');
+                        searchResults.classList.remove('active');
+                        searchInput.value = '';
+                        
+                        // Scroll to commands section
+                        document.getElementById('commands').scrollIntoView({ behavior: 'smooth' });
+                    });
+                    categoryDiv.appendChild(item);
+                });
+                
+                searchResults.appendChild(categoryDiv);
+            }
+            
+            if (results.characters.length === 0 && results.commands.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="search-category">
+                        <div style="padding: var(--space-md); text-align: center; color: var(--text-muted);">
+                            No results found for "${searchInput.value}"
+                        </div>
+                    </div>
+                `;
+            }
+            
+            searchResults.classList.add('active');
+        }
+
+        // ===== EVENT LISTENERS =====
+        function setupEventListeners() {
+            // Generation filter
+            generationFilter.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+                    renderCharacters(e.target.dataset.generation);
+                }
+            });
+
+            // Commands tabs
+            commandsTabs.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-btn')) {
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+                    renderCommands(e.target.dataset.category);
+                }
+            });
+
+            // Search
+            searchInput.addEventListener('input', () => {
+                performSearch(searchInput.value);
+            });
+
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.trim()) {
+                    performSearch(searchInput.value);
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.remove('active');
+                }
+            });
+
+            // Modal close
+            characterModal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal') || e.target.classList.contains('modal-close')) {
+                    characterModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && characterModal.classList.contains('active')) {
+                    characterModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Mobile menu
+            hamburger.addEventListener('click', () => {
+                const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
+                hamburger.setAttribute('aria-expanded', !isExpanded);
+                navMenu.classList.toggle('active');
+            });
+
+            // Close mobile menu when clicking links
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.setAttribute('aria-expanded', 'false');
+                    navMenu.classList.remove('active');
+                });
+            });
+        }
+
+        // ===== SCROLL ANIMATIONS =====
+        function setupScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        }
+    </script>
+
+<!-- Gameplay Image Modal -->
+<div id="gameplayModal" class="character-modal hidden">
+    <div class="character-modal-content">
+        <button class="modal-close" id="gameplayModalClose">&times;</button>
+        <div class="character-modal-left">
+            
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("gameplayModal");
+    const modalImg = document.getElementById("gameplayModalImg");
+    const closeBtn = document.getElementById("gameplayModalClose");
+
+    document.querySelectorAll(".gameplay-images img").forEach(img => {
+        img.addEventListener("click", () => {
+            modalImg.src = img.src;
+            modal.classList.remove("hidden");
+        });
+    });
+
+    closeBtn.addEventListener("click", () => {
+        modal.classList.add("hidden");
+        modalImg.src = "";
+    });
+
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.classList.add("hidden");
+            modalImg.src = "";
+        }
+    });
+});
+</script>
+
+</body>
+</html>
